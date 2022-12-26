@@ -8,6 +8,7 @@ class SignUpController extends GetxController {
   TextEditingController nipController = TextEditingController();
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
+  TextEditingController jobTitleController = TextEditingController();
   TextEditingController passwordDialogController = TextEditingController();
 
   FirebaseAuth auth = FirebaseAuth.instance;
@@ -43,6 +44,7 @@ class SignUpController extends GetxController {
             "nip": nipController.text,
             "name": nameController.text,
             "email": emailController.text,
+            "job_title": jobTitleController.text,
             "role": "karyawan",
             "uid": uid,
             "create_at": DateTime.now().toIso8601String(),
@@ -90,7 +92,8 @@ class SignUpController extends GetxController {
   Future<void> addPegawai() async {
     if (nameController.text.isNotEmpty &&
         nipController.text.isNotEmpty &&
-        emailController.text.isNotEmpty) {
+        emailController.text.isNotEmpty &&
+        jobTitleController.text.isNotEmpty) {
       isLoading.value = true;
       Get.defaultDialog(
         title: 'Konfirmasi Admin',

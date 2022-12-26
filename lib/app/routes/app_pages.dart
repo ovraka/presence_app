@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
 
+import '../modules/detail_presensi/bindings/detail_presensi_binding.dart';
+import '../modules/detail_presensi/views/detail_presensi_view.dart';
 import '../modules/forgot_password/bindings/forgot_password_binding.dart';
 import '../modules/forgot_password/views/forgot_password_view.dart';
 import '../modules/home/bindings/home_binding.dart';
@@ -64,6 +66,11 @@ class AppPages {
       name: _Paths.UPDATE_PASSWORD,
       page: () => const UpdatePasswordView(),
       binding: UpdatePasswordBinding(),
+    ),
+    GetPage(
+      name: _Paths.DETAIL_PRESENSI,
+      page: () => const DetailPresensiView(),
+      binding: DetailPresensiBinding(),
     ),
   ];
 }

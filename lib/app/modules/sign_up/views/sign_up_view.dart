@@ -46,8 +46,17 @@ class SignUpView extends GetView<SignUpController> {
                     readOnly: false,
                     controller: controller.emailController,
                     hintText: 'Email',
-                    textInputAction: TextInputAction.done,
+                    textInputAction: TextInputAction.next,
                     keyboardType: TextInputType.emailAddress),
+                const SizedBox(
+                  height: 20,
+                ),
+                inputText(
+                    readOnly: false,
+                    controller: controller.jobTitleController,
+                    hintText: 'Jabatan',
+                    textInputAction: TextInputAction.done,
+                    keyboardType: TextInputType.text),
                 const SizedBox(
                   height: 20,
                 ),

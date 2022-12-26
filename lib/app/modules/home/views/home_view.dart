@@ -1,7 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import '../../../controllers/page_index_controller.dart';
 import '../../../routes/app_pages.dart';
 import '../controllers/home_controller.dart';
@@ -14,20 +18,286 @@ class HomeView extends GetView<HomeController> {
     final size = MediaQuery.of(context).size;
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Home'),
+          title: const Text('HOME'),
           centerTitle: true,
-          actions: [
-            IconButton(
-                onPressed: () => Get.toNamed(Routes.PROFILE),
-                icon: const Icon(Icons.person))
-          ],
         ),
-        body: const Center(
-          child: Text(
-            'Home page',
-            style: TextStyle(fontSize: 20),
-          ),
-        ),
+        // ignore: prefer_const_constructors
+        body: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+            stream: controller.streamUser(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+              if (snapshot.hasData) {
+                Map<String, dynamic> user = snapshot.data!.data()!;
+                String defaultImage =
+                    "https://ui-avatars.com/api/?name=${user['name']}&&background=f0e9e9&&size=200";
+                return ListView(
+                  padding: const EdgeInsets.all(20),
+                  children: [
+                    Row(
+                      children: [
+                        ClipOval(
+                          child: Container(
+                            width: 75,
+                            height: 75,
+                            color: Colors.grey[200],
+                            child: Image.network(
+                                user["profile_picture"] ?? defaultImage,
+                                fit: BoxFit.cover),
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 20,
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Welcome",
+                              style: GoogleFonts.poppins(
+                                  textStyle: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.black)),
+                            ),
+                            Text(
+                              "Lokasi belum diatur",
+                              style: GoogleFonts.poppins(
+                                  textStyle: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w400,
+                                      color: Colors.black)),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: Colors.grey[200]),
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "${user['job_title']}",
+                              style: GoogleFonts.poppins(
+                                  textStyle: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.black)),
+                            ),
+                            // ignore: prefer_const_constructors
+                            SizedBox(
+                              height: 20,
+                            ),
+                            Text(
+                              "${user['nip']}",
+                              style: GoogleFonts.poppins(
+                                  textStyle: const TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.black)),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Text(
+                              "${user['name']}",
+                              style: GoogleFonts.poppins(
+                                  textStyle: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w400,
+                                      color: Colors.black)),
+                            ),
+                          ]),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: Colors.grey[200]),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Column(
+                            children: [
+                              Text(
+                                "Masuk",
+                                style: GoogleFonts.poppins(
+                                    textStyle: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.black)),
+                              ),
+                              Text(
+                                "-",
+                                style: GoogleFonts.poppins(
+                                    textStyle: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w300,
+                                        color: Colors.black)),
+                              ),
+                            ],
+                          ),
+                          Container(
+                            width: 2,
+                            color: Colors.grey,
+                            height: 40,
+                          ),
+                          Column(
+                            children: [
+                              Text(
+                                "Keluar",
+                                style: GoogleFonts.poppins(
+                                    textStyle: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.black)),
+                              ),
+                              Text(
+                                "-",
+                                style: GoogleFonts.poppins(
+                                    textStyle: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w300,
+                                        color: Colors.black)),
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Divider(
+                      color: Colors.grey[300],
+                      thickness: 2,
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Last 5 days",
+                          style: GoogleFonts.poppins(
+                              textStyle: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black)),
+                        ),
+                        TextButton(
+                          onPressed: () {},
+                          child: Text(
+                            "See more",
+                            style: GoogleFonts.poppins(
+                                textStyle: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            )),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemBuilder: (context, index) {
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 20),
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: Colors.grey[200]),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "Masuk",
+                                    style: GoogleFonts.poppins(
+                                        textStyle: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.black)),
+                                  ),
+                                  Text(
+                                    "${DateFormat.yMMMEd().format(DateTime.now())}",
+                                    style: GoogleFonts.poppins(
+                                        textStyle: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.black)),
+                                  ),
+                                ],
+                              ),
+                              Text(
+                                "${DateFormat.jms().format(DateTime.now())}",
+                                style: GoogleFonts.poppins(
+                                    textStyle: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w300,
+                                        color: Colors.black)),
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              Text(
+                                "Keluar",
+                                style: GoogleFonts.poppins(
+                                    textStyle: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.black)),
+                              ),
+                              Text(
+                                "${DateFormat.jms().format(DateTime.now())}",
+                                style: GoogleFonts.poppins(
+                                    textStyle: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w300,
+                                        color: Colors.black)),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                      itemCount: 5,
+                    ),
+                  ],
+                );
+              } else {
+                return Center(
+                  child: Text(
+                    "Tidak dapat memuat data",
+                    style: GoogleFonts.poppins(
+                        textStyle: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    )),
+                  ),
+                );
+              }
+            }),
         bottomNavigationBar: ConvexAppBar(
           style: TabStyle.fixedCircle,
           items: const [
