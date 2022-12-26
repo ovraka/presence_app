@@ -114,7 +114,10 @@ class UpdateProfileView extends GetView<UpdateProfileController> {
                                     height: 30,
                                     width: 100,
                                     child: ElevatedButton(
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        controller
+                                            .deleteProfilrPicture(user["uid"]);
+                                      },
                                       style: ElevatedButton.styleFrom(
                                         elevation: 0,
                                         backgroundColor: Colors.red[600],
