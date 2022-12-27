@@ -1,13 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:presence_app/app/routes/app_pages.dart';
 import '../../../controllers/page_index_controller.dart';
-import '../../../routes/app_pages.dart';
 import '../controllers/home_controller.dart';
 
 class HomeView extends GetView<HomeController> {
@@ -63,13 +62,18 @@ class HomeView extends GetView<HomeController> {
                                       fontWeight: FontWeight.w500,
                                       color: Colors.black)),
                             ),
-                            Text(
-                              "Lokasi belum diatur",
-                              style: GoogleFonts.poppins(
-                                  textStyle: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400,
-                                      color: Colors.black)),
+                            Container(
+                              width: 250,
+                              child: Text(
+                                user["address"] != null
+                                    ? "${user["address"]}"
+                                    : "Lokasi belum diatur",
+                                style: GoogleFonts.poppins(
+                                    textStyle: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w400,
+                                        color: Colors.black)),
+                              ),
                             ),
                           ],
                         )
@@ -200,7 +204,9 @@ class HomeView extends GetView<HomeController> {
                                   color: Colors.black)),
                         ),
                         TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Get.toNamed(Routes.MORE_PRESENSI);
+                          },
                           child: Text(
                             "See more",
                             style: GoogleFonts.poppins(
@@ -219,65 +225,77 @@ class HomeView extends GetView<HomeController> {
                       shrinkWrap: true,
                       physics: NeverScrollableScrollPhysics(),
                       itemBuilder: (context, index) {
-                        return Container(
-                          margin: const EdgeInsets.only(bottom: 20),
-                          padding: const EdgeInsets.all(20),
-                          decoration: BoxDecoration(
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 20),
+                          child: Material(
+                            borderRadius: BorderRadius.circular(20),
+                            color: Colors.grey[200],
+                            child: InkWell(
+                              onTap: () {
+                                Get.toNamed(Routes.DETAIL_PRESENSI);
+                              },
                               borderRadius: BorderRadius.circular(20),
-                              color: Colors.grey[200]),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    "Masuk",
-                                    style: GoogleFonts.poppins(
-                                        textStyle: const TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.black)),
-                                  ),
-                                  Text(
-                                    "${DateFormat.yMMMEd().format(DateTime.now())}",
-                                    style: GoogleFonts.poppins(
-                                        textStyle: const TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.black)),
-                                  ),
-                                ],
+                              child: Container(
+                                padding: const EdgeInsets.all(20),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          "Start Day",
+                                          style: GoogleFonts.poppins(
+                                              textStyle: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: Colors.black)),
+                                        ),
+                                        Text(
+                                          "${DateFormat.yMMMEd().format(DateTime.now())}",
+                                          style: GoogleFonts.poppins(
+                                              textStyle: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: Colors.black)),
+                                        ),
+                                      ],
+                                    ),
+                                    Text(
+                                      "${DateFormat.jms().format(DateTime.now())}",
+                                      style: GoogleFonts.poppins(
+                                          textStyle: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w300,
+                                              color: Colors.black)),
+                                    ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    Text(
+                                      "End Day",
+                                      style: GoogleFonts.poppins(
+                                          textStyle: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.black)),
+                                    ),
+                                    Text(
+                                      "${DateFormat.jms().format(DateTime.now())}",
+                                      style: GoogleFonts.poppins(
+                                          textStyle: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w300,
+                                              color: Colors.black)),
+                                    ),
+                                  ],
+                                ),
                               ),
-                              Text(
-                                "${DateFormat.jms().format(DateTime.now())}",
-                                style: GoogleFonts.poppins(
-                                    textStyle: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w300,
-                                        color: Colors.black)),
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Text(
-                                "Keluar",
-                                style: GoogleFonts.poppins(
-                                    textStyle: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.black)),
-                              ),
-                              Text(
-                                "${DateFormat.jms().format(DateTime.now())}",
-                                style: GoogleFonts.poppins(
-                                    textStyle: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w300,
-                                        color: Colors.black)),
-                              ),
-                            ],
+                            ),
                           ),
                         );
                       },

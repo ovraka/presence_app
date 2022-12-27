@@ -8,6 +8,8 @@ import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
 import '../modules/log_in/bindings/log_in_binding.dart';
 import '../modules/log_in/views/log_in_view.dart';
+import '../modules/more_presensi/bindings/more_presensi_binding.dart';
+import '../modules/more_presensi/views/more_presensi_view.dart';
 import '../modules/new_password/bindings/new_password_binding.dart';
 import '../modules/new_password/views/new_password_view.dart';
 import '../modules/profile/bindings/profile_binding.dart';
@@ -71,6 +73,11 @@ class AppPages {
       name: _Paths.DETAIL_PRESENSI,
       page: () => const DetailPresensiView(),
       binding: DetailPresensiBinding(),
+    ),
+    GetPage(
+      name: _Paths.MORE_PRESENSI,
+      page: () => const MorePresensiView(),
+      binding: MorePresensiBinding(),
     ),
   ];
 }
