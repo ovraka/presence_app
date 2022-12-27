@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:geocoding/geocoding.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../routes/app_pages.dart';
 import 'package:geolocator/geolocator.dart';
@@ -25,8 +27,13 @@ class PageIndexController extends GetxController {
           String address =
               "${placemarks[0].street}, ${placemarks[0].subLocality}, ${placemarks[0].locality}, ${placemarks[0].subAdministrativeArea}, ${placemarks[0].postalCode}";
           await updatePosition(position, address);
-          await presensi(position, address);
-          Get.snackbar("Berhasil!", "Anda telah absen");
+
+          //Cek distance position
+          double distance = Geolocator.distanceBetween(
+              -6.165911, 106.7786348, position.latitude, position.longitude);
+
+          //Presensi
+          await presensi(position, address, distance);
         } else {
           Get.snackbar("Terjadi Kesalahan", "${responseData["message"]}");
         }
@@ -42,7 +49,8 @@ class PageIndexController extends GetxController {
     }
   }
 
-  Future<void> presensi(Position position, String address) async {
+  Future<void> presensi(
+      Position position, String address, double distance) async {
     String uid = await auth.currentUser!.uid;
 
     CollectionReference<Map<String, dynamic>> colPresence =
@@ -53,19 +61,77 @@ class PageIndexController extends GetxController {
 
     DateTime now = DateTime.now();
     String docId = DateFormat.yMd().format(now).replaceAll("/", "-");
+    String status = "Di Luar Area Office";
+    if (distance <= 200) {
+      //Di dalam area jangkauan absensi
+      status = "Di Dalam Area Office";
+    }
 
     if (snapshootPresence.docs.isEmpty) {
       //belum absen sama sekali
-      await colPresence.doc(docId).set({
-        "date": now.toIso8601String(),
-        "start_day": {
-          "date": now.toIso8601String(),
-          "lat": position.latitude,
-          "long": position.longitude,
-          "address": address,
-          "status": "Di dalam area",
-        }
-      });
+
+      await Get.defaultDialog(
+          title: "Perhatian!",
+          content: Padding(
+            padding: const EdgeInsets.only(right: 10, left: 10),
+            child: Column(
+              children: [
+                Center(
+                  child: Text(
+                    "Apakah anda yakin ingin absen MASUK sekarang ?",
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.poppins(
+                        textStyle: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    )),
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton(
+                        onPressed: () => Get.back(),
+                        child: Text(
+                          "Cancel",
+                          style: GoogleFonts.poppins(
+                              textStyle: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w300,
+                          )),
+                        )),
+                    TextButton(
+                        onPressed: () async {
+                          await colPresence.doc(docId).set({
+                            "date": now.toIso8601String(),
+                            "start_day": {
+                              "date": now.toIso8601String(),
+                              "lat": position.latitude,
+                              "long": position.longitude,
+                              "address": address,
+                              "status": status,
+                              "distance": distance,
+                            }
+                          });
+                          Get.back();
+                          Get.snackbar("Berhasil!", "Anda telah absen masuk");
+                        },
+                        child: Text(
+                          "Ok",
+                          style: GoogleFonts.poppins(
+                              textStyle: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          )),
+                        )),
+                  ],
+                ),
+              ],
+            ),
+          ));
     } else {
       //Cek absen masuk dan keluar hari ini sudah/belum
       DocumentSnapshot<Map<String, dynamic>> todayDoc =
@@ -74,29 +140,134 @@ class PageIndexController extends GetxController {
       if (todayDoc.exists == true) {
         Map<String, dynamic>? dataPresenceToday = await todayDoc.data();
         if (dataPresenceToday?["end_day"] != null) {
-          Get.snackbar('Berhasil', 'Presence has complete');
+          Get.snackbar('Peringatan!', 'Anda telah absen hari ini');
         } else {
-          await colPresence.doc(docId).update({
-            "end_day": {
-              "date": now.toIso8601String(),
-              "lat": position.latitude,
-              "long": position.longitude,
-              "address": address,
-              "status": "Di dalam area",
-            }
-          });
+          await Get.defaultDialog(
+              title: "Perhatian!",
+              content: Padding(
+                padding: const EdgeInsets.only(right: 10, left: 10),
+                child: Column(
+                  children: [
+                    Center(
+                      child: Text(
+                        "Apakah anda yakin ingin absen KELUAR sekarang ?",
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.poppins(
+                            textStyle: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        )),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        TextButton(
+                            onPressed: () => Get.back(),
+                            child: Text(
+                              "Cancel",
+                              style: GoogleFonts.poppins(
+                                  textStyle: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w300,
+                              )),
+                            )),
+                        TextButton(
+                            onPressed: () async {
+                              await colPresence.doc(docId).update({
+                                "end_day": {
+                                  "date": now.toIso8601String(),
+                                  "lat": position.latitude,
+                                  "long": position.longitude,
+                                  "address": address,
+                                  "status": status,
+                                  "distance": distance,
+                                }
+                              });
+                              Get.back();
+                              Get.snackbar(
+                                  "Berhasil!", "Anda telah absen keluar");
+                            },
+                            child: Text(
+                              "Ok",
+                              style: GoogleFonts.poppins(
+                                  textStyle: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              )),
+                            )),
+                      ],
+                    ),
+                  ],
+                ),
+              ));
         }
       } else {
-        await colPresence.doc(docId).set({
-          "date": now.toIso8601String(),
-          "start_day": {
-            "date": now.toIso8601String(),
-            "lat": position.latitude,
-            "long": position.longitude,
-            "address": address,
-            "status": "Di dalam area",
-          }
-        });
+        await Get.defaultDialog(
+            title: "Perhatian!",
+            content: Padding(
+              padding: const EdgeInsets.only(right: 10, left: 10),
+              child: Column(
+                children: [
+                  Center(
+                    child: Text(
+                      "Apakah anda yakin ingin absen MASUK sekarang ?",
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.poppins(
+                          textStyle: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      )),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      TextButton(
+                          onPressed: () => Get.back(),
+                          child: Text(
+                            "Cancel",
+                            style: GoogleFonts.poppins(
+                                textStyle: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w300,
+                            )),
+                          )),
+                      TextButton(
+                          onPressed: () async {
+                            await colPresence.doc(docId).set({
+                              "date": now.toIso8601String(),
+                              "start_day": {
+                                "date": now.toIso8601String(),
+                                "lat": position.latitude,
+                                "long": position.longitude,
+                                "address": address,
+                                "status": status,
+                                "distance": distance,
+                              }
+                            });
+                            Get.back();
+                            Get.snackbar("Berhasil!", "Anda telah absen masuk");
+                          },
+                          child: Text(
+                            "Ok",
+                            style: GoogleFonts.poppins(
+                                textStyle: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            )),
+                          )),
+                    ],
+                  ),
+                ],
+              ),
+            ));
       }
     }
   }

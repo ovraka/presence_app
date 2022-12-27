@@ -131,56 +131,81 @@ class HomeView extends GetView<HomeController> {
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
                           color: Colors.grey[200]),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Column(
-                            children: [
-                              Text(
-                                "Masuk",
-                                style: GoogleFonts.poppins(
-                                    textStyle: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.black)),
-                              ),
-                              Text(
-                                "-",
-                                style: GoogleFonts.poppins(
-                                    textStyle: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w300,
-                                        color: Colors.black)),
-                              ),
-                            ],
-                          ),
-                          Container(
-                            width: 2,
-                            color: Colors.grey,
-                            height: 40,
-                          ),
-                          Column(
-                            children: [
-                              Text(
-                                "Keluar",
-                                style: GoogleFonts.poppins(
-                                    textStyle: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.black)),
-                              ),
-                              Text(
-                                "-",
-                                style: GoogleFonts.poppins(
-                                    textStyle: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w300,
-                                        color: Colors.black)),
-                              ),
-                            ],
-                          )
-                        ],
-                      ),
+                      child:
+                          StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                              stream: controller.streamTodayPresence(),
+                              builder: (context, snapshotT) {
+                                if (snapshotT.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                }
+
+                                Map<String, dynamic>? dataToday =
+                                    snapshotT.data?.data();
+                                return Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: [
+                                    Column(
+                                      children: [
+                                        Text(
+                                          "Start Day",
+                                          style: GoogleFonts.poppins(
+                                              textStyle: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: Colors.black)),
+                                        ),
+                                        Text(
+                                          dataToday?["start_day"] == null
+                                              ? "-"
+                                              : DateFormat.jms().format(
+                                                  DateTime.parse(
+                                                      dataToday!["start_day"]
+                                                          ["date"])),
+                                          style: GoogleFonts.poppins(
+                                              textStyle: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w400,
+                                                  color: Colors.black)),
+                                        ),
+                                      ],
+                                    ),
+                                    Container(
+                                      width: 2,
+                                      color: Colors.grey,
+                                      height: 40,
+                                    ),
+                                    Column(
+                                      children: [
+                                        Text(
+                                          "End Day",
+                                          style: GoogleFonts.poppins(
+                                              textStyle: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: Colors.black)),
+                                        ),
+                                        Text(
+                                          dataToday?["end_day"] == null
+                                              ? "-"
+                                              : DateFormat.jms().format(
+                                                  DateTime.parse(
+                                                      dataToday!["end_day"]
+                                                          ["date"])),
+                                          style: GoogleFonts.poppins(
+                                              textStyle: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w400,
+                                                  color: Colors.black)),
+                                        ),
+                                      ],
+                                    )
+                                  ],
+                                );
+                              }),
                     ),
                     const SizedBox(
                       height: 20,
@@ -221,86 +246,135 @@ class HomeView extends GetView<HomeController> {
                     const SizedBox(
                       height: 10,
                     ),
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 20),
-                          child: Material(
-                            borderRadius: BorderRadius.circular(20),
-                            color: Colors.grey[200],
-                            child: InkWell(
-                              onTap: () {
-                                Get.toNamed(Routes.DETAIL_PRESENSI);
-                              },
-                              borderRadius: BorderRadius.circular(20),
-                              child: Container(
-                                padding: const EdgeInsets.all(20),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          "Start Day",
-                                          style: GoogleFonts.poppins(
-                                              textStyle: const TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w600,
-                                                  color: Colors.black)),
-                                        ),
-                                        Text(
-                                          "${DateFormat.yMMMEd().format(DateTime.now())}",
-                                          style: GoogleFonts.poppins(
-                                              textStyle: const TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w600,
-                                                  color: Colors.black)),
-                                        ),
-                                      ],
-                                    ),
-                                    Text(
-                                      "${DateFormat.jms().format(DateTime.now())}",
-                                      style: GoogleFonts.poppins(
-                                          textStyle: const TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w300,
-                                              color: Colors.black)),
-                                    ),
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    Text(
-                                      "End Day",
-                                      style: GoogleFonts.poppins(
-                                          textStyle: const TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w600,
-                                              color: Colors.black)),
-                                    ),
-                                    Text(
-                                      "${DateFormat.jms().format(DateTime.now())}",
-                                      style: GoogleFonts.poppins(
-                                          textStyle: const TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w300,
-                                              color: Colors.black)),
-                                    ),
-                                  ],
+                    StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                        stream: controller.streamLastPresence(),
+                        builder: (context, snapshotP) {
+                          if (snapshotP.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                          // ignore: unrelated_type_equality_checks
+                          if (snapshotP.data!.docs.isEmpty ||
+                              snapshotP.data == null) {
+                            return SizedBox(
+                              height: 150,
+                              child: Center(
+                                child: Text(
+                                  "Belum ada history presensi.",
+                                  style: GoogleFonts.poppins(
+                                    textStyle: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.black),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
-                        );
-                      },
-                      itemCount: 5,
-                    ),
+                            );
+                          }
+
+                          return ListView.builder(
+                            itemCount: snapshotP.data!.docs.length,
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            itemBuilder: (context, index) {
+                              Map<String, dynamic> data =
+                                  snapshotP.data!.docs[index].data();
+
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 20),
+                                child: Material(
+                                  borderRadius: BorderRadius.circular(20),
+                                  color: Colors.grey[200],
+                                  child: InkWell(
+                                    onTap: () {
+                                      Get.toNamed(Routes.DETAIL_PRESENSI);
+                                    },
+                                    borderRadius: BorderRadius.circular(20),
+                                    child: Container(
+                                      padding: const EdgeInsets.all(20),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                "Start Day",
+                                                style: GoogleFonts.poppins(
+                                                  textStyle: const TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: Colors.black),
+                                                ),
+                                              ),
+                                              Text(
+                                                DateFormat.yMMMEd().format(
+                                                    DateTime.parse(
+                                                        data["date"])),
+                                                style: GoogleFonts.poppins(
+                                                  textStyle: const TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: Colors.black),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          Text(
+                                            data["start_day"]?["date"] == null
+                                                ? "-"
+                                                : DateFormat.jms().format(
+                                                    DateTime.parse(data[
+                                                        "start_day"]!["date"])),
+                                            style: GoogleFonts.poppins(
+                                              textStyle: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w400,
+                                                  color: Colors.black),
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                            height: 10,
+                                          ),
+                                          Text(
+                                            "End Day",
+                                            style: GoogleFonts.poppins(
+                                              textStyle: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: Colors.black),
+                                            ),
+                                          ),
+                                          Text(
+                                            data["end_day"]?["date"] == null
+                                                ? "-"
+                                                : DateFormat.jms().format(
+                                                    DateTime.parse(data[
+                                                        "end_day"]!["date"])),
+                                            style: GoogleFonts.poppins(
+                                                textStyle: const TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w400,
+                                                    color: Colors.black)),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        }),
                   ],
                 );
               } else {
