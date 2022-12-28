@@ -16,13 +16,14 @@ dependencies:
   google_fonts: ^3.0.1
   svg_icon: ^0.0.1
   image_picker: 0.8.6
-  flutter:
-    sdk: flutter
   path_provider: ^2.0.11
   convex_bottom_bar: ^3.1.0+1
   intl: ^0.18.0
   geolocator: ^9.0.2
   geocoding: ^2.0.5
+  syncfusion_flutter_datepicker: 19.4.56
+  flutter:
+    sdk: flutter
 
 dev_dependencies:
   flutter_lints: ^2.0.0

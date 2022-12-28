@@ -7,7 +7,8 @@ import 'package:intl/intl.dart';
 import '../controllers/detail_presensi_controller.dart';
 
 class DetailPresensiView extends GetView<DetailPresensiController> {
-  const DetailPresensiView({Key? key}) : super(key: key);
+  final Map<String, dynamic> data = Get.arguments;
+  DetailPresensiView({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,7 +29,8 @@ class DetailPresensiView extends GetView<DetailPresensiController> {
                 children: [
                   Center(
                     child: Text(
-                      "${DateFormat.yMMMMEEEEd().format(DateTime.now())}",
+                      DateFormat.yMMMMEEEEd()
+                          .format(DateTime.parse(data['date'])),
                       style: GoogleFonts.poppins(
                           textStyle: const TextStyle(
                               fontSize: 16,
@@ -48,7 +50,7 @@ class DetailPresensiView extends GetView<DetailPresensiController> {
                             color: Colors.black)),
                   ),
                   Text(
-                    "Time : ${DateFormat.jms().format(DateTime.now())}",
+                    "Time : ${DateFormat.jms().format(DateTime.parse(data['start_day']!['date']))}",
                     style: GoogleFonts.poppins(
                         textStyle: const TextStyle(
                             fontSize: 14,
@@ -56,7 +58,7 @@ class DetailPresensiView extends GetView<DetailPresensiController> {
                             color: Colors.black)),
                   ),
                   Text(
-                    "Location : -6.123.123.123",
+                    "Location : ${data['start_day']!['lat']}, ${data['start_day']!['long']}",
                     style: GoogleFonts.poppins(
                         textStyle: const TextStyle(
                             fontSize: 14,
@@ -64,7 +66,23 @@ class DetailPresensiView extends GetView<DetailPresensiController> {
                             color: Colors.black)),
                   ),
                   Text(
-                    "Status : Coverage Area",
+                    "Distance : ${data['start_day']!['distance'].toString().split(".").first} M",
+                    style: GoogleFonts.poppins(
+                        textStyle: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w300,
+                            color: Colors.black)),
+                  ),
+                  Text(
+                    "Address : ${data['start_day']!['address']}",
+                    style: GoogleFonts.poppins(
+                        textStyle: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w300,
+                            color: Colors.black)),
+                  ),
+                  Text(
+                    "Status : ${data['start_day']!['status']}",
                     style: GoogleFonts.poppins(
                         textStyle: const TextStyle(
                             fontSize: 14,
@@ -83,7 +101,9 @@ class DetailPresensiView extends GetView<DetailPresensiController> {
                             color: Colors.black)),
                   ),
                   Text(
-                    "Time : ${DateFormat.jms().format(DateTime.now())}",
+                    data['end_day']?['date'] == null
+                        ? "Time : -"
+                        : "Time : ${DateFormat.jms().format(DateTime.parse(data['end_day']!['date']))}",
                     style: GoogleFonts.poppins(
                         textStyle: const TextStyle(
                             fontSize: 14,
@@ -91,7 +111,10 @@ class DetailPresensiView extends GetView<DetailPresensiController> {
                             color: Colors.black)),
                   ),
                   Text(
-                    "Location : -6.123.123.123",
+                    data['end_day']?['lat'] == null &&
+                            data['end_day']?['long'] == null
+                        ? "Location : -"
+                        : "Location : ${data['end_day']!['lat']}, ${data['end_day']!['long']}",
                     style: GoogleFonts.poppins(
                         textStyle: const TextStyle(
                             fontSize: 14,
@@ -99,7 +122,29 @@ class DetailPresensiView extends GetView<DetailPresensiController> {
                             color: Colors.black)),
                   ),
                   Text(
-                    "Status : Coverage Area",
+                    data['end_day']?['distance'] == null
+                        ? "Distance : -"
+                        : "Distance : ${data['end_day']!['distance'].toString().split(".").first} M",
+                    style: GoogleFonts.poppins(
+                        textStyle: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w300,
+                            color: Colors.black)),
+                  ),
+                  Text(
+                    data['end_day']?['address'] == null
+                        ? "Address : -"
+                        : "Address : ${data['end_day']!['address']}",
+                    style: GoogleFonts.poppins(
+                        textStyle: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w300,
+                            color: Colors.black)),
+                  ),
+                  Text(
+                    data['end_day']?['status'] == null
+                        ? "Status : -"
+                        : "Status : ${data['end_day']!['status']}",
                     style: GoogleFonts.poppins(
                         textStyle: const TextStyle(
                             fontSize: 14,
